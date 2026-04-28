@@ -1,12 +1,16 @@
 export type ThemeVariant = 'parchment' | 'midnight' | 'minimal'
 export type Language = 'zh-TW' | 'zh-CN' | 'en'
+export type ChapterStatus = 'draft' | 'writing' | 'done'
+export type NoteKind = 'background' | 'outline' | 'world'
 
 export interface Chapter {
   id: string
   title: string
   content: string
   wordCount: number
-  status: string
+  status: ChapterStatus
+  summary?: string
+  sortOrder?: number
 }
 
 export interface Character {
@@ -20,6 +24,40 @@ export interface Character {
   background: string
   relationships: string
   color: string
+  sortOrder?: number
+}
+
+export interface Novel {
+  id: string
+  title: string
+  sourceLanguage: string
+  archivedAt: string | null
+  purgeAfter: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NovelSummary extends Novel {
+  chapterCount: number
+  totalWords: number
+}
+
+export interface NovelNote {
+  id: string
+  novelId: string
+  title: string
+  content: string
+  kind: NoteKind
+  sortOrder: number
+  updatedAt: string
+}
+
+export interface AIUsage {
+  usageDate: string
+  novelInitCount: number
+  novelInitLimit: number
+  writingAiCount: number
+  writingAiLimit: number
 }
 
 export interface AppSettings {

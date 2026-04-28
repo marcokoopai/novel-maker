@@ -1,17 +1,22 @@
 import { useState } from 'react'
-import { Theme, Translation, Chapter, Character } from '../types'
+import { Theme, Translation, Chapter, Character, NovelNote } from '../types'
 import { STATUS_COLORS } from '../lib/data'
+import { STATUS_LABELS } from '../lib/i18n'
 
 interface Props {
   theme: Theme
   t: Translation
+  lang: keyof typeof STATUS_LABELS
+  novelTitle: string
   chapters: Chapter[]
   characters: Character[]
-  notes: string
+  notes: NovelNote[]
   activeChapterId: string
+  activeNoteId: string
   onSelectChapter: (id: string) => void
   onAddChapter: () => void
-  onNotesChange: (notes: string) => void
+  onSelectNote: (id: string) => void
+  onNoteChange: (id: string, content: string) => void
   onSelectCharacter: (char: Character) => void
 }
 
@@ -20,11 +25,12 @@ function IUser() { return <svg width="15" height="15" viewBox="0 0 15 15" fill="
 function INote() { return <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 2h9a1 1 0 011 1v8l-3 3H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.2"/><path d="M12 11H9v3" stroke="currentColor" strokeWidth="1.2"/></svg> }
 function IPlus() { return <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="6.5" y1="2" x2="6.5" y2="11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/><line x1="2" y1="6.5" x2="11" y2="6.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg> }
 
-export default function Sidebar({ theme, t, chapters, characters, notes, activeChapterId, onSelectChapter, onAddChapter, onNotesChange, onSelectCharacter }: Props) {
+export default function Sidebar({ theme, t, lang, novelTitle, chapters, characters, notes, activeChapterId, activeNoteId, onSelectChapter, onAddChapter, onSelectNote, onNoteChange, onSelectCharacter }: Props) {
   const [tab, setTab] = useState<'chapters' | 'characters' | 'notes'>('chapters')
   const s = theme.sidebar
   const totalWords = chapters.reduce((sum, c) => sum + (c.wordCount || 0), 0)
-  const doneCount = chapters.filter(c => c.status === t.statusDone).length
+  const doneCount = chapters.filter(c => c.status === 'done').length
+  const activeNote = notes.find(note => note.id === activeNoteId) || notes[0]
 
   const TABS = [
     { id: 'chapters' as const, Icon: IBook, label: t.tabs.chapters },
@@ -36,7 +42,7 @@ export default function Sidebar({ theme, t, chapters, characters, notes, activeC
     <div style={{ width: 240, minWidth: 240, height: '100%', background: s.bg, borderRight: '1px solid ' + s.border, display: 'flex', flexDirection: 'column', fontFamily: theme.font.body, color: s.text, userSelect: 'none' }}>
       <div style={{ padding: '18px 16px 12px', borderBottom: '1px solid ' + s.border }}>
         <div style={{ fontSize: 11, letterSpacing: '0.1em', color: s.textMuted, marginBottom: 4, textTransform: 'uppercase' }}>{t.myNovel}</div>
-        <div style={{ fontSize: 17, fontFamily: theme.font.heading, fontWeight: 700, lineHeight: 1.3 }}>戀愛在晴天</div>
+        <div style={{ fontSize: 17, fontFamily: theme.font.heading, fontWeight: 700, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{novelTitle}</div>
         <div style={{ marginTop: 8, fontSize: 11, color: s.textMuted }}>{totalWords.toLocaleString()} {t.wordUnit} · {doneCount}/{chapters.length} {t.chapDone}</div>
         <div style={{ marginTop: 6, height: 3, background: s.border, borderRadius: 2 }}>
           <div style={{ height: '100%', width: (chapters.length > 0 ? (doneCount / chapters.length) * 100 : 0) + '%', background: theme.accent, borderRadius: 2, transition: 'width 0.4s' }} />
@@ -62,7 +68,7 @@ export default function Sidebar({ theme, t, chapters, characters, notes, activeC
               >
                 <span style={{ fontSize: 10, color: s.textMuted, minWidth: 18 }}>{String(i + 1).padStart(2, '0')}</span>
                 <span style={{ flex: 1, fontSize: 13, fontWeight: activeChapterId === ch.id ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.title}</span>
-                <span style={{ fontSize: 9, color: STATUS_COLORS[ch.status] || s.textMuted, background: (STATUS_COLORS[ch.status] || s.textMuted) + '22', padding: '1px 5px', borderRadius: 3 }}>{ch.status}</span>
+                <span style={{ fontSize: 9, color: STATUS_COLORS[ch.status] || s.textMuted, background: (STATUS_COLORS[ch.status] || s.textMuted) + '22', padding: '1px 5px', borderRadius: 3 }}>{STATUS_LABELS[lang][ch.status]}</span>
               </div>
             ))}
             <button onClick={onAddChapter} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'transparent', border: 'none', cursor: 'pointer', color: s.textMuted, fontSize: 12, width: '100%', fontFamily: theme.font.body }}
@@ -92,8 +98,16 @@ export default function Sidebar({ theme, t, chapters, characters, notes, activeC
 
         {tab === 'notes' && (
           <div style={{ padding: '12px' }}>
-            <div style={{ fontSize: 11, color: s.textMuted, marginBottom: 6 }}>{t.worldNotes}</div>
-            <textarea value={notes} onChange={e => onNotesChange(e.target.value)}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 10 }}>
+              {notes.map(note => (
+                <button key={note.id} onClick={() => onSelectNote(note.id)}
+                  style={{ textAlign: 'left', padding: '6px 8px', border: '1px solid ' + (activeNote?.id === note.id ? theme.accent + '66' : s.border), borderRadius: 6, background: activeNote?.id === note.id ? theme.accent + '14' : s.activeBg, color: activeNote?.id === note.id ? theme.accent : s.text, cursor: 'pointer', fontSize: 12, fontFamily: theme.font.body }}>
+                  {note.title}
+                </button>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: s.textMuted, marginBottom: 6 }}>{activeNote ? activeNote.title : t.worldNotes}</div>
+            <textarea value={activeNote ? activeNote.content : ''} onChange={e => activeNote && onNoteChange(activeNote.id, e.target.value)}
               style={{ width: '100%', minHeight: 200, background: s.activeBg, border: '1px solid ' + s.border, borderRadius: 6, padding: '8px', fontSize: 12, color: s.text, fontFamily: theme.font.body, resize: 'vertical', lineHeight: 1.7, outline: 'none', boxSizing: 'border-box' }}
               placeholder={t.worldNotesPlaceholder} />
           </div>

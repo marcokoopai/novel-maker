@@ -1,4 +1,114 @@
-import { Language, Translation } from '../types'
+import { ChapterStatus, Language, NoteKind, Translation } from '../types'
+
+export const STATUS_LABELS: Record<Language, Record<ChapterStatus, string>> = {
+  'zh-TW': { draft: '草稿', writing: '寫作中', done: '已完成' },
+  'zh-CN': { draft: '草稿', writing: '写作中', done: '已完成' },
+  en: { draft: 'Draft', writing: 'Writing', done: 'Done' },
+}
+
+export const NOTE_LABELS: Record<Language, Record<NoteKind, string>> = {
+  'zh-TW': { background: '背景設定', outline: '故事大綱', world: '世界觀筆記' },
+  'zh-CN': { background: '背景设定', outline: '故事大纲', world: '世界观笔记' },
+  en: { background: 'Background', outline: 'Outline', world: 'World Notes' },
+}
+
+export const WORKFLOW_COPY: Record<Language, {
+  auth: Record<string, string>
+  library: Record<string, string>
+  settings: Record<string, string>
+  states: Record<string, string>
+}> = {
+  'zh-TW': {
+    auth: {
+      signIn: '登入', signUp: '註冊', email: 'Email', password: '密碼', confirmPassword: '確認密碼',
+      forgotPassword: '忘記密碼？', resetPassword: '重設密碼', newPassword: '新密碼',
+      sendReset: '寄送重設信', backToSignIn: '返回登入', createAccount: '建立帳號',
+      haveAccount: '已有帳號？登入', needAccount: '沒有帳號？註冊',
+      resetSent: '如果此 Email 已註冊，重設密碼信已寄出。', passwordUpdated: '密碼已更新',
+      mismatch: '兩次輸入的密碼不一致', missingConfig: '尚未設定 Supabase 環境變數。',
+      currentPassword: '目前密碼', updatePassword: '修改密碼',
+    },
+    library: {
+      title: '小說庫', active: '近期小說', archived: '已歸檔', newNovel: '新建小說',
+      empty: '還沒有小說。', archivedEmpty: '沒有已歸檔小說。', open: '開啟',
+      create: '建立空白小說', novelTitle: '小說標題', sourceLanguage: '創作語言',
+      updated: '最近編輯', chapters: '章節', words: '字', restore: '恢復',
+      archiveHint: '歸檔後 7 天內可恢復', purgeAfter: '永久刪除時間',
+      untitledNovel: '未命名小說', blankAiNote: 'AI 初始化會在後續階段接入；目前可先建立空白小說。',
+      signOut: '登出',
+    },
+    settings: {
+      preferences: '偏好設定', novel: '小說設定', account: '帳號', aiUsage: '今日 AI 用量',
+      title: '小說標題', sourceLanguage: '創作語言', archiveNovel: '歸檔小說',
+      updateNovel: '更新小說設定', novelInit: '小說初始化', writingAi: '寫作輔助',
+      save: '儲存', passwordUpdated: '密碼已更新',
+    },
+    states: {
+      loading: '載入中…', saving: '保存中…', synced: '已同步', error: '發生錯誤', retry: '重試',
+      back: '返回小說庫', multiTabBlocked: '已有另一個分頁正在編輯，請先回到原分頁或關閉它。',
+    },
+  },
+  'zh-CN': {
+    auth: {
+      signIn: '登录', signUp: '注册', email: 'Email', password: '密码', confirmPassword: '确认密码',
+      forgotPassword: '忘记密码？', resetPassword: '重设密码', newPassword: '新密码',
+      sendReset: '发送重设邮件', backToSignIn: '返回登录', createAccount: '创建账号',
+      haveAccount: '已有账号？登录', needAccount: '没有账号？注册',
+      resetSent: '如果此 Email 已注册，重设密码邮件已发送。', passwordUpdated: '密码已更新',
+      mismatch: '两次输入的密码不一致', missingConfig: '尚未设置 Supabase 环境变量。',
+      currentPassword: '当前密码', updatePassword: '修改密码',
+    },
+    library: {
+      title: '小说库', active: '近期小说', archived: '已归档', newNovel: '新建小说',
+      empty: '还没有小说。', archivedEmpty: '没有已归档小说。', open: '打开',
+      create: '创建空白小说', novelTitle: '小说标题', sourceLanguage: '创作语言',
+      updated: '最近编辑', chapters: '章节', words: '字', restore: '恢复',
+      archiveHint: '归档后 7 天内可恢复', purgeAfter: '永久删除时间',
+      untitledNovel: '未命名小说', blankAiNote: 'AI 初始化会在后续阶段接入；目前可先创建空白小说。',
+      signOut: '登出',
+    },
+    settings: {
+      preferences: '偏好设置', novel: '小说设置', account: '账号', aiUsage: '今日 AI 用量',
+      title: '小说标题', sourceLanguage: '创作语言', archiveNovel: '归档小说',
+      updateNovel: '更新小说设置', novelInit: '小说初始化', writingAi: '写作辅助',
+      save: '保存', passwordUpdated: '密码已更新',
+    },
+    states: {
+      loading: '加载中…', saving: '保存中…', synced: '已同步', error: '发生错误', retry: '重试',
+      back: '返回小说库', multiTabBlocked: '已有另一个分页正在编辑，请先回到原分页或关闭它。',
+    },
+  },
+  en: {
+    auth: {
+      signIn: 'Sign in', signUp: 'Sign up', email: 'Email', password: 'Password', confirmPassword: 'Confirm password',
+      forgotPassword: 'Forgot password?', resetPassword: 'Reset password', newPassword: 'New password',
+      sendReset: 'Send reset email', backToSignIn: 'Back to sign in', createAccount: 'Create account',
+      haveAccount: 'Have an account? Sign in', needAccount: 'Need an account? Sign up',
+      resetSent: 'If this email is registered, a reset link has been sent.', passwordUpdated: 'Password updated',
+      mismatch: 'Passwords do not match', missingConfig: 'Supabase environment variables are not configured.',
+      currentPassword: 'Current password', updatePassword: 'Update password',
+    },
+    library: {
+      title: 'Novel Library', active: 'Recent', archived: 'Archived', newNovel: 'New Novel',
+      empty: 'No novels yet.', archivedEmpty: 'No archived novels.', open: 'Open',
+      create: 'Create blank novel', novelTitle: 'Novel title', sourceLanguage: 'Writing language',
+      updated: 'Updated', chapters: 'chapters', words: 'words', restore: 'Restore',
+      archiveHint: 'Archived novels can be restored for 7 days', purgeAfter: 'Permanent deletion',
+      untitledNovel: 'Untitled Novel', blankAiNote: 'AI initialization will be added in a later phase; create a blank novel for now.',
+      signOut: 'Sign out',
+    },
+    settings: {
+      preferences: 'Preferences', novel: 'Novel Settings', account: 'Account', aiUsage: 'Today AI Usage',
+      title: 'Novel title', sourceLanguage: 'Writing language', archiveNovel: 'Archive novel',
+      updateNovel: 'Update novel settings', novelInit: 'Novel initialization', writingAi: 'Writing assistant',
+      save: 'Save', passwordUpdated: 'Password updated',
+    },
+    states: {
+      loading: 'Loading…', saving: 'Saving…', synced: 'Synced', error: 'Something went wrong', retry: 'Retry',
+      back: 'Back to library', multiTabBlocked: 'Another tab is already editing. Return to that tab or close it first.',
+    },
+  },
+}
 
 export const TRANSLATIONS: Record<Language, Translation> = {
   'zh-TW': {
