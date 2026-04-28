@@ -13,7 +13,7 @@ interface Props {
 export default function CharacterModal({ theme, t, character, onClose, onSave }: Props) {
   const initRole = t.roles[0] || '主角'
   const [form, setForm] = useState<Character>(
-    character || { id: String(Date.now()), name: '', age: '', role: initRole, appearance: '', personality: '', speechStyle: '', background: '', relationships: '', color: CHAR_COLORS[0] }
+    character || { id: crypto.randomUUID(), name: '', age: '', role: initRole, appearance: '', personality: '', speechStyle: '', background: '', relationships: '', color: CHAR_COLORS[0] }
   )
   const s = theme.modal
   const set = (k: keyof Character, v: string) => setForm(f => ({ ...f, [k]: v }))

@@ -1,19 +1,21 @@
-import { Theme, Translation, Chapter } from '../types'
+import { Theme, Translation, Chapter, Language } from '../types'
 import { STATUS_COLORS } from '../lib/data'
+import { STATUS_LABELS } from '../lib/i18n'
 
 interface Props {
   theme: Theme
   t: Translation
+  lang: Language
   chapters: Chapter[]
   onClose: () => void
 }
 
-export default function ProgressPanel({ theme, t, chapters, onClose }: Props) {
+export default function ProgressPanel({ theme, t, lang, chapters, onClose }: Props) {
   const s = theme.modal
   const totalWords = chapters.reduce((sum, c) => sum + (c.wordCount || 0), 0)
   const target = 80000
   const pct = Math.min(100, Math.round((totalWords / target) * 100))
-  const doneCount = chapters.filter(c => c.status === t.statusDone).length
+  const doneCount = chapters.filter(c => c.status === 'done').length
   const weekData = [420, 680, 550, 890, 1200, 740, 980]
   const maxW = Math.max(...weekData)
 
@@ -70,7 +72,7 @@ export default function ProgressPanel({ theme, t, chapters, onClose }: Props) {
                 <span style={{ fontSize: 11, color: s.textMuted, minWidth: 24 }}>Ch{i + 1}</span>
                 <span style={{ flex: 1, fontSize: 13 }}>{ch.title}</span>
                 <span style={{ fontSize: 11, color: s.textMuted }}>{(ch.wordCount || 0).toLocaleString()} {t.wordUnit}</span>
-                <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: (STATUS_COLORS[ch.status] || '#8B7355') + '20', color: STATUS_COLORS[ch.status] || '#8B7355' }}>{ch.status}</span>
+                <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: (STATUS_COLORS[ch.status] || '#8B7355') + '20', color: STATUS_COLORS[ch.status] || '#8B7355' }}>{STATUS_LABELS[lang][ch.status]}</span>
               </div>
             ))}
           </div>

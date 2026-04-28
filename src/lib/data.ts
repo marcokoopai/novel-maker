@@ -3,16 +3,17 @@ import { Chapter, Character } from '../types'
 export const CHAR_COLORS = ['#C17F3E', '#7A9B76', '#5B8FA8', '#A87B9B', '#C17F7F', '#7B9BC1']
 
 export const STATUS_COLORS: Record<string, string> = {
+  draft: '#C17F3E', writing: '#7A9B76', done: '#5B8FA8',
   '草稿': '#C17F3E', '寫作中': '#7A9B76', '已完成': '#5B8FA8',
   'Draft': '#C17F3E', 'Writing': '#7A9B76', 'Done': '#5B8FA8',
   '写作中': '#7A9B76',
 }
 
 export const INIT_CHAPTERS: Chapter[] = [
-  { id: '1', title: '初遇在咖啡廳', wordCount: 94, status: '已完成', content: '那天，陳曉晴沒想到自己會這樣狼狽地闖進一間咖啡廳。\n\n外頭的雨來得突然，她的傘不知什麼時候壞了，只好抱著筆電躲進最近的一家店——就是這家叫做「初見」的小咖啡廳。\n\n「歡迎光臨。」\n\n她來不及擦乾臉上的雨水，就對上了吧台後那雙安靜的眼睛。\n\n林沐川把視線從手中的咖啡豆移開，看了她一秒，然後遞來一條乾淨的毛巾。' },
-  { id: '2', title: '雨夜的偶然', wordCount: 62, status: '寫作中', content: '第二次見到林沐川，是在一個月後的週五夜晚。\n\n曉晴去便利商店買消夜，結帳時才發現錢包忘在家裡。她正窘迫地翻著口袋，身後有人輕聲說：\n\n「我幫你付。」\n\n她愣了一下，回頭——是那個咖啡廳的男人。' },
-  { id: '3', title: '相互誤解', wordCount: 0, status: '草稿', content: '' },
-  { id: '4', title: '告白前夕', wordCount: 0, status: '草稿', content: '' },
+  { id: '1', title: '初遇在咖啡廳', wordCount: 94, status: 'done', content: '那天，陳曉晴沒想到自己會這樣狼狽地闖進一間咖啡廳。\n\n外頭的雨來得突然，她的傘不知什麼時候壞了，只好抱著筆電躲進最近的一家店——就是這家叫做「初見」的小咖啡廳。\n\n「歡迎光臨。」\n\n她來不及擦乾臉上的雨水，就對上了吧台後那雙安靜的眼睛。\n\n林沐川把視線從手中的咖啡豆移開，看了她一秒，然後遞來一條乾淨的毛巾。' },
+  { id: '2', title: '雨夜的偶然', wordCount: 62, status: 'writing', content: '第二次見到林沐川，是在一個月後的週五夜晚。\n\n曉晴去便利商店買消夜，結帳時才發現錢包忘在家裡。她正窘迫地翻著口袋，身後有人輕聲說：\n\n「我幫你付。」\n\n她愣了一下，回頭——是那個咖啡廳的男人。' },
+  { id: '3', title: '相互誤解', wordCount: 0, status: 'draft', content: '' },
+  { id: '4', title: '告白前夕', wordCount: 0, status: 'draft', content: '' },
 ]
 
 export const INIT_CHARS: Character[] = [
