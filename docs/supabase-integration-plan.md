@@ -1,6 +1,8 @@
-# Supabase Hosted 接入規格
+# Legacy Supabase Hosted 接入規格
 
 Last updated: 2026-04-27
+
+> Status: historical reference. The current migration target is self-hosted Supabase. For DB initialization and credential handling, use `docs/self-hosted-db-initialization.md` and `scripts/supabase-push-db.sh`.
 
 本文檔整理目前關於把 Novel Maker 接入 Supabase Hosted 的產品與技術決策。它是後續實作的依據，不是最終 API 文檔；如實作中發現約束衝突，應先更新本文檔再改代碼。
 
@@ -15,7 +17,7 @@ Last updated: 2026-04-27
 
 ## 2. 高層目標
 
-使用 Supabase Hosted service，不 self-host。
+原方案使用 Supabase Hosted service，不 self-host。當前遷移目標已改為 self-hosted Supabase。
 
 第一版要完成：
 

@@ -1,6 +1,6 @@
 # Supabase 開發流程
 
-本專案使用 Supabase Hosted，先連 dev 遠端專案，本地不跑 Supabase stack。
+本專案目前以 self-hosted Supabase 為主要開發目標。前端本地只跑 Vite dev server，資料庫 schema 透過 Supabase CLI 的 `--db-url` 推到 self-hosted Postgres。
 
 ## 本地環境
 
@@ -10,12 +10,14 @@
 cp .env.example .env
 ```
 
-填入 dev project：
+填入 self-hosted Supabase public API：
 
 ```env
-VITE_SUPABASE_URL=https://<dev-project-ref>.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=<dev-publishable-key>
+VITE_SUPABASE_URL=https://supabase.example.com
+VITE_SUPABASE_ANON_KEY=<anon-key>
 ```
+
+`.env` 是前端 build-time 設定，只能放 public URL 和 anon/publishable key。不要把 Postgres URL、Postgres password、service role key 或 JWT secret 放進前端 `.env`。
 
 Auth redirect URLs 先配置：
 
@@ -24,105 +26,63 @@ http://localhost:5173/**
 http://localhost:5173/update-password
 ```
 
-## CLI
+## DB 初始化與 migrations
 
-首次連 dev：
-
-```bash
-npx supabase link --project-ref <dev-project-ref>
-```
-
-推 migration 到 dev：
+self-hosted 不使用 `supabase link --project-ref`。DB migrations 直接用 Postgres connection string：
 
 ```bash
-npx supabase db push
+scripts/supabase-push-db.sh
 ```
 
-如果遇到直連 Postgres 的 TLS/網路錯誤，例如：
-
-```text
-failed to connect to postgres: failed to connect to `host=db.<project-ref>.supabase.co ...`: tls error (EOF)
-```
-
-改用 Supabase Session Pooler URL。CLI link 後通常會保存到：
+推薦只在當前 shell 提供非敏感連線參數，password 由腳本交互輸入且不回顯：
 
 ```bash
-cat supabase/.temp/pooler-url
+export SUPABASE_DB_HOST='db.example.com'
+export SUPABASE_DB_PORT='5432'
+export SUPABASE_DB_USER='postgres'
+export SUPABASE_DB_NAME='postgres'
+export SUPABASE_DB_SSLMODE='require'
+
+scripts/supabase-push-db.sh
 ```
 
-目前 dev project 的 pooler host 類似：
-
-```text
-postgresql://postgres.<project-ref>@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres
-```
-
-把 database password 加進 URL，並加上 SSL 參數：
+也可以用一次性 secret 變量：
 
 ```bash
-npx supabase migration list --db-url "postgresql://postgres.<project-ref>:<DATABASE_PASSWORD>@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
-npx supabase db push --db-url "postgresql://postgres.<project-ref>:<DATABASE_PASSWORD>@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
+export SUPABASE_DB_URL='postgresql://postgres:<DATABASE_PASSWORD>@db.example.com:5432/postgres?sslmode=require'
+scripts/supabase-push-db.sh
+unset SUPABASE_DB_URL
 ```
 
-如果 password 有 `@`, `#`, `/`, `?`, `:` 等特殊字元，必須先 percent-encode。這裡使用的是 Supabase project 的 database password，不是 Supabase 帳號密碼。
-
-本 repo 也提供了互動式 helper，會在本機終端隱藏輸入 database password：
-
-```bash
-scripts/supabase-push-pooler.sh
-```
-
-也可以用環境變數非互動執行：
-
-```bash
-SUPABASE_DB_PASSWORD='<DATABASE_PASSWORD>' scripts/supabase-push-pooler.sh
-```
+詳見 `docs/self-hosted-db-initialization.md`。
 
 生成 TypeScript DB types：
 
 ```bash
-npx supabase gen types typescript --linked > src/lib/database.types.ts
-```
-
-production 應在 dev 驗證後再 link 並推送：
-
-```bash
-npx supabase link --project-ref <prod-project-ref>
-npx supabase db push
+scripts/supabase-push-db.sh --types
 ```
 
 ## AI Secrets
 
-AI secrets 放 Supabase Edge Function secrets，不放前端 `.env`：
-
-```bash
-npx supabase secrets set AI_API_BASE_URL=https://api.openai.com/v1
-npx supabase secrets set AI_API_KEY=<key>
-npx supabase secrets set AI_INIT_MODEL=<model>
-npx supabase secrets set AI_WRITING_MODEL=<model>
-```
-
-dev 和 production 各自配置 secrets。
+AI secrets 不放前端 `.env`。self-hosted Edge Functions 使用 Docker env 或 env file 注入，例如 `AI_API_BASE_URL`、`AI_API_KEY`、`AI_INIT_MODEL`、`AI_WRITING_MODEL`，修改後需要重建或重啟 functions service。
 
 ## Gmail SMTP
 
-開發期可以用個人 Gmail 作為 Supabase Auth custom SMTP，但只建議小流量測試。
-
-Supabase Auth -> Emails / SMTP settings 建議：
+開發期可以用個人 Gmail 作為 Supabase Auth custom SMTP，但只建議小流量測試。self-hosted 透過 Supabase Docker `.env` 配置 SMTP：
 
 ```text
-Host: smtp.gmail.com
-Port: 587
-Username: <your-gmail-address>
-Password: <Google app password>
-Sender email: <your-gmail-address>
-Sender name: Novel Maker
+SMTP_ADMIN_EMAIL=<your-gmail-address>
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=<your-gmail-address>
+SMTP_PASS=<Google app password>
+SMTP_SENDER_NAME=Novel Maker
 ```
 
 如果 587 不通，改試：
 
 ```text
-Host: smtp.gmail.com
-Port: 465
+SMTP_PORT=465
 ```
 
 注意事項：
