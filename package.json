@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "postbuild": "node scripts/log-deploy-info.mjs postbuild",
-    "preview": "node scripts/preview.mjs"
+    "start": "node scripts/serve-dist.mjs",
+    "preview": "node scripts/serve-dist.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

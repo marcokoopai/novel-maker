@@ -29,7 +29,33 @@ For the recommended Dokploy static deployment, the expected listen port is:
 expected_static_listen_port=80
 ```
 
-If you use `npm run preview` for a manual smoke test instead of Dokploy static hosting, the preview script logs the actual preview host and port. Dokploy production domains should still use container port `80` when `Publish Directory` is configured.
+If you use `npm run preview` for a manual smoke test instead of Dokploy static hosting, the static server logs the actual preview host and port. Dokploy production domains should still use container port `80` when `Publish Directory` is configured.
+
+## Service Mode Fallback
+
+If Dokploy is configured as a long-running Node service instead of a static publish-directory app, use:
+
+```text
+Build Command: npm run build
+Start Command: npm start
+Domain Port: 4173 unless PORT is set
+```
+
+`npm start` serves the built `dist/` directory with `scripts/serve-dist.mjs`. It binds to `0.0.0.0` and uses `PORT`, then `VITE_PREVIEW_PORT`, then `4173`.
+
+For example, either leave `PORT` unset and set Dokploy Domain Port to `4173`, or set:
+
+```env
+PORT=3000
+```
+
+and set Dokploy Domain Port to `3000`.
+
+Do not use `npm run dev` in production. If the domain returns `502 Bad Gateway`, first check that the container is running and that Dokploy forwards to the same port printed by:
+
+```text
+[novel-studio:serve] port=...
+```
 
 ## Environment Variables
 
