@@ -19,6 +19,18 @@ Dokploy should run the existing `npm run build` script. No custom start command 
 
 `Static SPA / isStaticSpa` must stay enabled so direct visits and Supabase Auth redirects to `/update-password` fall back to `index.html` instead of returning 404.
 
+## Deployment Log Probes
+
+`npm run build` emits `[novel-studio:deploy]` lines before and after the Vite build. These lines record the build phase, the `./dist` publish directory, whether `dist/index.html` exists, and the expected static container listen port.
+
+For the recommended Dokploy static deployment, the expected listen port is:
+
+```text
+expected_static_listen_port=80
+```
+
+If you use `npm run preview` for a manual smoke test instead of Dokploy static hosting, the preview script logs the actual preview host and port. Dokploy production domains should still use container port `80` when `Publish Directory` is configured.
+
 ## Environment Variables
 
 Set these on the Dokploy application. Vite embeds `VITE_*` variables at build time, so changing any of them requires a new deployment, not just a container restart.
